@@ -1,5 +1,5 @@
-mqtt2livechart
-==============
+mqtt2highcharts
+===============
 
 Simple example of plotting live numbered data from a subscribed mqtt/websockets topic and plotting it using highcharts. http://www.highcharts.com/
 
