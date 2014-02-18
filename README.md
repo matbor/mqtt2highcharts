@@ -12,4 +12,4 @@ Also requires **mqttws31.js** javascript library, which you can get from http://
 
 VIDEO example; http://youtu.be/e-cpH3K70Xw
 
-![example](https://raw2.github.com/matbor/mqtt2livechart/master/chart.png)
+![example](https://raw2.github.com/matbor/mqtt2highcharts/master/chart.png)
