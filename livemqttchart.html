@@ -81,9 +81,17 @@ public broker and topic you can use for testing.
 		 
 		var y = dataTopics.indexOf(message.destinationName); //get the index no of the topic from the array
 		var myEpoch = new Date().getTime(); //get current epoch time
-		var thenum = message.payloadString.replace( /^\D+/g, ''); //remove any text from the message
+		var thenum = message.payloadString.replace( /^\D+/g, ''); //remove any text spaces from the message
 		var plotMqtt = [myEpoch, Number(thenum)]; //create the array
-		plot(plotMqtt, y);	//send it to the plot function
+		if (isNumber(thenum)) { //check if it is a real number and not text
+			console.log('is a propper number, will send to chart.')
+			plot(plotMqtt, y);	//send it to the plot function
+		};
+	};
+
+//check if a real number	
+	function isNumber(n) {
+	  return !isNaN(parseFloat(n)) && isFinite(n);
 	};
 
 //function that is called once the document has loaded
