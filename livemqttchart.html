@@ -17,19 +17,18 @@ public broker and topic you can use for testing.
 
 	var MQTTbroker = 'broker.mqttdashboard.com';
 	var MQTTport = 8000;
-	var MQTTsubTopic = 'dcsquare/cubes/1/temperature';
+	var MQTTsubTopic = 'dcsquare/cubes/#'; //works with wildcard # and + topics dynamically now
 
 */
 
 //settings BEGIN
 	var MQTTbroker = 'broker.mqttdashboard.com';
 	var MQTTport = 8000;
-	var MQTTsubTopic = 'dcsquare/cubes/1/temperature';
+	var MQTTsubTopic = 'dcsquare/cubes/#'; //works with wildcard # and + topics dynamically now
 //settings END
 
-
-
 	var chart; // global variuable for chart
+	var dataTopics = new Array();
 
 //mqtt broker 
 	var client = new Messaging.Client(MQTTbroker, MQTTport,
@@ -63,31 +62,57 @@ public broker and topic you can use for testing.
 	function onMessageArrived(message) {
 		console.log(message.destinationName, '',message.payloadString);
 
+		//check if it is a new topic, if not add it to the array
+		if (dataTopics.indexOf(message.destinationName) < 0){
+		    
+		    dataTopics.push(message.destinationName); //add new topic to array
+		    var y = dataTopics.indexOf(message.destinationName); //get the index no
+		    
+		    //create new data series for the chart
+			var newseries = {
+		            id: y,
+		            name: message.destinationName,
+		            data: []
+		            };
+
+			chart.addSeries(newseries); //add the series
+		    
+		    };
+		 
+		var y = dataTopics.indexOf(message.destinationName); //get the index no of the topic from the array
 		var myEpoch = new Date().getTime(); //get current epoch time
 		var thenum = message.payloadString.replace( /^\D+/g, ''); //remove any text from the message
 		var plotMqtt = [myEpoch, Number(thenum)]; //create the array
-		//var plotMqtt = [myEpoch, Number(message.payloadString)]; //create the array
-		plot(plotMqtt);	//send it to the plot function
+		plot(plotMqtt, y);	//send it to the plot function
 	};
 
 //function that is called once the document has loaded
 	function init() {
 
+		//i find i have to set this to false if i have trouble with timezones.
+		Highcharts.setOptions({
+			global: {
+				useUTC: false
+			}
+		});
+
 		// Connect to MQTT broker
 		client.connect(options);
+
 	};
 
 
 //this adds the plots to the chart	
-    function plot(point) {
+    function plot(point, chartno) {
     	console.log(point);
-        var series = chart.series[0],
-            shift = series.data.length > 20; // shift if the series is 
-                                             // longer than 20
+    	
+	        var series = chart.series[0],
+	            shift = series.data.length > 20; // shift if the series is 
+	                                             // longer than 20
+	        // add the point
+	        chart.series[chartno].addPoint(point, true, shift);  
 
-        // add the point
-        chart.series[0].addPoint(point, true, shift);  
-    };
+	};
 
 //settings for the chart
 	$(document).ready(function() {
@@ -115,10 +140,7 @@ public broker and topic you can use for testing.
 	                margin: 80
 	            }
 	        },
-	        series: [{
-	            name: 'Random data',
-	            data: []
-	        }]
+	        series: []
 	    });        
 	});
 
