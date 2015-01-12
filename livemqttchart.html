@@ -31,7 +31,7 @@ public broker and topic you can use for testing.
 	var dataTopics = new Array();
 
 //mqtt broker 
-	var client = new Messaging.Client(MQTTbroker, MQTTport,
+	var client = new Paho.MQTT.Client(MQTTbroker, MQTTport,
 				"myclientid_" + parseInt(Math.random() * 100, 10));
 	client.onMessageArrived = onMessageArrived;
 	client.onConnectionLost = onConnectionLost;
